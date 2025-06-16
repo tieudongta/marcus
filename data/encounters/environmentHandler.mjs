@@ -1,20 +1,20 @@
 import chalk from 'chalk';
 
-export async function handleEnvironmentEncounter(player, encounter) {
+export async function handleEnvironmentEncounter(player, encounter, { ask = null, choice = null } = {}) {
   console.log(chalk.cyanBright(`\n🌍 ${encounter.name}`));
   console.log(encounter.description);
 
-  // Example: collapsed bridge scenario
-  if (encounter.id === 'collapsed_bridge') {
-    console.log(`\nThe bridge is out. It will cost time or a skill check to cross.`);
-    // If you had a challenge/skill system:
-    // const success = await obstacleSystem.challenge(player, 'agility');
-    // if (success) { ... } else { ... }
-
-    console.log(chalk.yellow(`⏳ You detour and lose time.`));
-    player.timeSystem.advanceTime?.(2);
-    player.loseEnergy(5);
+  if (choice?.toLowerCase().startsWith('y')) {
+    console.log(chalk.gray(`🌫️ You decided to go ahead. Bravery ++`));
+    player.bravery++;
+    player.timeSystem.advanceTime(1);
+    player.loseEnergy(2);
+    return { interrupt: true };
   } else {
-    console.log(chalk.gray(`🌫️ Nothing you can do here for now.`));
+    console.log(chalk.yellow(`⏳ You detour and lose time. Charisma ++`));
+    player.charisma++;
+    player.timeSystem.advanceTime(3);
+    player.loseEnergy(6);
+    return { interrupt: false };
   }
 }

@@ -5,7 +5,7 @@ export class Item {
         type = "item",
         requirements = "", 
         effect = {}, 
-        stackable = false, 
+        stackable = true, 
         price = 0, 
         rarity = "common", durability }) {
         this.name = name;

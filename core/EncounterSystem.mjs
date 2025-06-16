@@ -53,8 +53,8 @@ export class EncounterSystem {
   console.log(`📍 Chosen Encounter: ${encounter.name} [${encounter.type}]`);
 
   let choice;
-  if (encounter.prompt) {
-    choice = await this.utils.ask(encounter.prompt);
+  if (encounter.prompt && encounter.choices?.length >= 2) {
+    choice = await this.utils.ask(encounter.prompt, encounter.choices);
   }
   console.log("Calling encounter handler with:");
   console.log("encounter:", encounter.id);

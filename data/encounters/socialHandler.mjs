@@ -1,20 +1,19 @@
 import chalk from 'chalk';
 import { ask } from '../../scripts/utils/ask.mjs';
 
-export async function handleSocialEncounter(player, encounter,ask) {
+export async function handleSocialEncounter(player, encounter,{ ask = null, choice = null } = {}) {
   console.log(chalk.cyanBright(`\n🤝 ${encounter.name}`));
   console.log(encounter.description);
 
-  const response = await ask(`Do you want to chat or trade? (chat/trade/leave): `);
-
-  if (response.toLowerCase().startsWith('chat')) {
-    console.log("🗣️ The NPC shares a local rumor about a nearby ruin...");
-    player.knowledge = (player.knowledge || 0) + 1;
-  } else if (response.toLowerCase().startsWith('trade')) {
-    console.log("💰 The merchant offers some goods.");
-    // Optional: Hook to your trade system
-    // await merchantTradeSystem.offer(player);
+  if (choice?.toLowerCase().startsWith('y')) {
+    console.log("🗣️ You decided that you still had a lot of time and stopped a while.");
+    player.charisma++;
+    player.loseEnergy(2);
+    player.timeSystem.advanceTime(0, 30);
+    return { interrupt: true };
   } else {
-    console.log("🚶‍♂️ You nod politely and move on.");
+    console.log("🚶‍♂️ Time is essential, you decide to move on.");
+    player.charisma--;
+    return { interrupt: false };
   }
 }

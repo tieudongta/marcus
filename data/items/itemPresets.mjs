@@ -39,6 +39,13 @@ export const itemPresets = {
   }),
   
 //Potion
+  healing_herbs: new Potion({
+    name: "Healing Herbs",
+    description: "Heals 10 HP",
+    effectAmount: 10,
+    price: 10,
+    rarity: "common"
+  }),
   minor_health_potion: new Potion({
     name: "Minor Healing Potion",
     description: "Heals 20 HP",
