@@ -1,0 +1,22 @@
+[
+  {
+    "label": "Sleep",
+    "duration": 480,
+    "allowedPhases": ["Night"],
+    "requiredStats": { "energy": 10 },
+    "locationRequired": "bedroom",
+    "requiresItem": ["Blanket"],
+    "givesXP": { "rest": 5 },
+    "effect": { "energy": 50, "health": 10 }
+  },
+  {
+    "label": "Train",
+    "duration": 60,
+    "allowedPhases": ["Morning", "Afternoon"],
+    "requiredStats": { "energy": 20 },
+    "locationRequired": "gym",
+    "requiresItem": ["TrainingPass"],
+    "givesXP": { "strength": 15 },
+    "effect": { "energy": -10 }
+  }
+]

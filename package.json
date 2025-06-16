@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "test": "mocha --recursive --extensions mjs \"tests/**/*.test.mjs\""
+  },
+  "type": "module",
+  "devDependencies": {
+    "chai": "^5.2.0",
+    "mocha": "^11.5.0"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "lodash.clonedeep": "^4.5.0"
+  }
+}

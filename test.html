@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game Tests</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mocha/mocha.css" />
+</head>
+<body>
+  <div id="mocha"></div>
+
+  <!-- Mocha library -->
+  <script src="https://cdn.jsdelivr.net/npm/mocha/mocha.js"></script>
+  <!-- Chai assertion library -->
+  <script src="https://unpkg.com/chai@4.3.4/chai.js"></script>
+  <!-- Sinon for spies/mocks -->
+  <script src="https://unpkg.com/sinon@15.0.0/pkg/sinon.js"></script>
+
+  <script>
+    // Set up mocha
+    mocha.setup('bdd');
+
+    // Expose chai and sinon globally
+    window.expect = chai.expect;
+    window.sinon = sinon;
+  </script>
+
+  <!-- Your game code and tests as ES modules -->
+  <script src="./Game.js"></script>
+  <script src="./test.mjs"></script>
+
+  <script>
+    // Run the tests after everything is loaded
+    mocha.run();
+  </script>
+</body>
+</html>
