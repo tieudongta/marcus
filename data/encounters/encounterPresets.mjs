@@ -37,19 +37,6 @@ export const encounterPresets = [
 
   // --- SOCIAL ---
   {
-    id: "wandering_merchant",
-    name: "Wandering Merchant",
-    type: "social",
-    description: "A merchant with a rickety cart offers you goods and a story.",
-    race: 'Human',
-    region: ["road", "forest"],
-    timeOfDay: ["Morning", "Afternoon"],
-    difficulty: 'easy',
-    handler: handleSocialEncounter,
-    prompt: "🧑‍🦱 The merchant greets you warmly and offers a rare trinket. Choose an action (yes/no): ",
-    choices: ["Yes", "No"]
-  },
-  {
     id: "traveling_bard",
     name: "Traveling Bard",
     type: "social",
@@ -197,4 +184,22 @@ export const encounterPresets = [
       return { interrupt: false };
     },
   },
+  //----MERCHANT
+  {
+  id: "wandering_merchant",
+  type: "social",
+  subtype: "merchant",
+  name: "Wandering Merchant",
+  description: "A cloaked traveler waves you down, offering to trade rare wares.",
+  region: ["road", "wilderness"],
+  timeOfDay: ["Day"],
+  race: "Any",
+  choices: ["Yes, show me what you have.", "No thanks."],
+  shopInventory: [
+    { id: "elixir_of_shadows", name: "Elixir of Shadows", price: 300 },
+    { id: "fire_resist_cloak", name: "Fire-Resist Cloak", price: 450 }
+  ],
+  handler: handleSocialEncounter,
+}
+
 ];

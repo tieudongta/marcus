@@ -11,6 +11,9 @@ export class QuestSystem {
         this.player = player;
         this.activeQuests = [];
     }
+    removeQuest(quest) {
+        this.activeQuests =  this.activeQuests.filter(q => q !== quest);
+    }
     addQuest(quest) {
         this.activeQuests = this.activeQuests.filter(q => q.status !== 'completed');
         quest.start();
@@ -43,7 +46,9 @@ export class QuestSystem {
             to,
             data: { from, to, progress: 0, route: [] },
             target: {
-                Deadline: this.player.timeSystem.totalMinutes + (template.target.timeOffset * 60),
+                ...template.target,
+                location: to,
+                time: this.player.timeSystem.totalMinutes + (template.target.timeOffset * 60),
             }
         });
     }
@@ -74,6 +79,7 @@ export class QuestSystem {
     Deadline: ${timeLeft}`;
         }).join('\n\n');
     }
+    //createQuestFromTemplate
     createQuestFromTemplate(questId) {
         const template = questPresets.find(q => q.id === questId);
         if (!template) {
@@ -103,7 +109,8 @@ export class QuestSystem {
             currentStage: q.getStage()?.name,
         }));
     }
-    generateDeliveryQuest(player) {
+    //
+    generateDeliveryGuide(player) {
         // if (player.level <= 2) return;
         const location = player.currentLocation;
         if (!location || location.type !== 'town') return;
@@ -119,7 +126,7 @@ export class QuestSystem {
             console.warn("Quest id deliver_101 template not found");
             return;
         }
-        console.log("DEBUG time calc:", player.timeSystem.currentTime, template.target?.timeOffset);
+        //console.log("DEBUG time calc:", player.timeSystem.currentTime, template.target?.timeOffset);
 
         const time = player.timeSystem.currentTime + (template.target.timeOffset * 60);
         const quest = new DeliveryQuest({

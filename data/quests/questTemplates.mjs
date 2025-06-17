@@ -1,4 +1,3 @@
-// questPresets.mjs
 export const questPresets = [
   {
     id: "deliver_101",
@@ -7,7 +6,7 @@ export const questPresets = [
     description: "Deliver this sealed scroll to officials in the capital.",
     target: {
       item: "sealed_scroll",
-      timeOffset: 48, // in hours
+      timeOffset: 48, // hours from quest start
     },
     reward: {
       gold: 150,
@@ -16,14 +15,14 @@ export const questPresets = [
     trigger: {
       conditions: [
         { type: "player_level", operator: ">", value: 0 },
-        { type: "currentLocationType", value: "town" }
+        { type: "currentLocationType", value: "town" },
       ],
     },
     stages: [
-      { name: 'Receive Quest', description: 'Receive Quest' },
-      { name: 'Travel to Destination', description: 'Travel to Location B with the package.' },
-      { name: 'Deliver Package', description: 'Deliver the package to NPC at Location B.' },
-      { name: 'Complete Quest', description: 'Quest success or failure check.' },
+      { name: "Receive Quest", description: "Receive the sealed scroll." },
+      { name: "Travel to Destination", description: "Travel to the capital with the scroll." },
+      { name: "Deliver Package", description: "Deliver the scroll to the capital officials." },
+      { name: "Complete Quest", description: "Confirm successful delivery." },
     ],
   },
   {
@@ -44,27 +43,36 @@ export const questPresets = [
       conditions: [
         { type: "player_level", operator: ">", value: 1 },
         { type: "currentLocation", value: "Location A" },
-        { type: "has_completed", value: "deliver_101" }
+        { type: "has_completed", value: "deliver_101" },
       ],
     },
+    stages: [
+      { name: "Receive Quest", description: "Receive the letter." },
+      { name: "Travel to Destination", description: "Go to Location B." },
+      { name: "Deliver Package", description: "Hand over the letter." },
+      { name: "Complete Quest", description: "Finalize the delivery." },
+    ],
   },
   {
-    id: 'deliver',
-    type: 'deliver',
-    name: 'Delivery Order',
-    description: 'Deliver a package from Location A to Location B.',
-    stages: [
-      { name: 'Receive Quest', description: 'Receive the package and quest from NPC.' },
-      { name: 'Travel to Destination', description: 'Travel to Location B with the package.' },
-      { name: 'Deliver Package', description: 'Deliver the package to NPC at Location B.' },
-      { name: 'Complete Quest', description: 'Quest success or failure check.' },
-    ],
+    id: "deliver",
+    type: "deliver",
+    name: "Delivery Order",
+    description: "Deliver a package from Location A to Location B.",
     npcLevel: 3,
-    rewards: { baseGold: 100, baseXp: 100 },
+    reward: {
+      baseGold: 100,
+      baseXp: 100,
+    },
     target: {
       location: "Location B",
       item: "package",
       timeOffset: 48,
     },
+    stages: [
+      { name: "Receive Quest", description: "Get the package from the NPC." },
+      { name: "Travel to Destination", description: "Reach Location B with the package." },
+      { name: "Deliver Package", description: "Give the package to the recipient." },
+      { name: "Complete Quest", description: "Conclude the delivery process." },
+    ],
   },
 ];

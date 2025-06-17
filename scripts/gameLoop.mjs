@@ -14,7 +14,7 @@ export async function startGameLoop(player, travelSystem, encounterSystem) {
     const questManager = new QuestSystem(player);
     let active = true;
 
-    let currentQuest = questManager.generateDeliveryQuest(player);
+    let currentQuest = questManager.generateDeliveryGuide(player);
     //console.error(currentQuest);
     if (!currentQuest) {
         console.error("⚠️ Failed to generate a delivery quest. Check player level, location, or template availability.");
@@ -179,9 +179,10 @@ export async function startGameLoop(player, travelSystem, encounterSystem) {
 
         const cont = await ask("🎮 Start a new delivery quest? (yes/no): ");
         if (cont.trim().toLowerCase().startsWith("y")) {
+            questManager.removeQuest(currentQuest);
             currentQuest = questManager.createQuestFromTemplate('deliver');
-            //questManager.addQuest(currentQuest);
-            console.error(currentQuest);
+            questManager.addQuest(currentQuest);
+            //console.error(currentQuest);
         } else {
             active = false;
         }

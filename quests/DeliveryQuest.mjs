@@ -1,35 +1,63 @@
-import { Quest } from "./Quest.mjs";
+import { Quest } from './Quest.mjs';
 
 export class DeliveryQuest extends Quest {
-    constructor(config) {
-        super(config);
-        this.data.from = config.from;
-        this.data.to = config.to;
-        this.data.arrived = false;
+  constructor(config) {
+    super(config);
+    this.data.from = config.from ?? 'unknown';
+    this.data.to = config.to ?? config.target?.location ?? 'unknown';
+    this.data.arrived = false;
+    this.data.itemDelivered = false;
+  }
+
+  validate(player) {
+    const item = this.target?.item;
+    const location = this.target?.location;
+
+    if (!item || !location) {
+      console.warn("⚠ Delivery quest target item or location is undefined.");
+      return { isValid: false, isComplete: false, details: {} };
     }
-    validate(player) {
-        if (!this.target.item) {
-            console.warn("⚠ Quest target item is undefined.");
-            return false;
+
+    const onTime = this.validateTime(player);
+    const hasItem = player.inventory?.hasItem?.(item);
+    const atLocation = player.currentLocation === location;
+
+    return {
+      isValid: onTime,
+      isComplete: onTime && hasItem && atLocation,
+      details: { onTime, hasItem, atLocation },
+    };
+  }
+  validateStage(player, gameState, stage) {
+    const stageName = stage?.name.toLowerCase();
+
+    switch (stageName) {
+      case 'receive quest':
+        return true; // Always auto-progress after start
+
+      case 'travel to destination':
+        return player.currentLocation === this.data.to;
+
+      case 'deliver package':
+        if (
+          player.currentLocation === this.data.to &&
+          player.inventory?.hasItem?.(this.target.item)
+        ) {
+          player.inventory.removeItem(this.target.item);
+          this.data.itemDelivered = true;
+          return true;
         }
-        const onTime = this.validateTime(player);
-        const hasItem = player.inventory.hasItem(this.target.item);
-        const atLocation = player.currentLocation === this.target.location;
-        return {
-            isValid: onTime,
-            isComplete: onTime && hasItem && atLocation,
-            details: {
-                onTime,
-                hasItem,
-                atLocation
-            }
-        }
+        return false;
+
+      case 'complete quest':
+        return this.data.itemDelivered;
+
+      default:
+        return false;
     }
-    update(player, gameState) {
-        if (this.status !== 'in_progress') return;
-        if (player.currentLocation === this.data.to && !this.data.arrived) {
-            this.data.arrived = true;
-            this.advanceStage();
-        }
-    }
+  }
+  update(player, gameState) {
+    if (this.status !== 'in_progress') return;
+    super.update(player, gameState);
+  }
 }

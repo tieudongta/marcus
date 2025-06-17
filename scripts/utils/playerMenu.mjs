@@ -23,7 +23,7 @@ export async function showPlayerMenu(player, currentLocation) {
   return choice;
 }
 export async function showQuestLog(questManager) {
-  const logText = questManager.getQuestStatusText(player);
+  const logText = questManager.getQuestStatusText();
   console.log("\n📘 Quest Log:");
   console.log(logText || "No active quests.");
   await ask("Press Enter to return.");
