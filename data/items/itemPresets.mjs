@@ -78,6 +78,15 @@ export const itemPresets = {
     price: 5,
     rarity: "common"
   }),
+  sealed_scroll: new Item({
+    name: "Sealed Scroll",
+    description: "The scroll is sealed. You don't know what inside.",
+    type: "item",
+    durability: 0,
+    stackable: true,
+    price: 0,
+    rarity: "common"
+  }),
 
   fur: new Item({
     name: "Rat Fur",
@@ -97,10 +106,19 @@ export const itemPresets = {
     price: 100,
     rarity: "rare"
   }),
+  package: new Item({
+    name: "Package",
+    description: "A package to deliver.",
+    type: "item",
+    durability: 10,
+    stackable: false,
+    price: 1000,
+    rarity: "common"
+  }),
   bread: new Item({
     name: "Bread",
     description: "Not good food.",
-    type: "material",
+    type: "item",
     durability: 10,
     stackable: true,
     price: 1,

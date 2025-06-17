@@ -1,6 +1,6 @@
 // quest.js
 export class Quest {
-    constructor({ id, name, description, stages }) {
+    constructor({ id, name, description, stages, target }) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -8,6 +8,32 @@ export class Quest {
         this.currentStage = 0; // index of current stage
         this.status = 'not_started'; // 'not_started', 'in_progress', 'completed', 'failed'
         this.data = {}; // for tracking progress like destination, item status, etc.
+        this.target = target;
+    }
+    evaluateQuestStatus(validationResult) {
+        if (!validationResult.isValid) {
+            return {
+                status: 'expired',
+                message: 'Quest has expired or is no longer valid.'
+            };
+        }
+
+        if (validationResult.isComplete) {
+            return {
+                status: 'complete',
+                message: 'Quest objectives completed successfully!'
+            };
+        }
+
+        return {
+            status: 'in_progress',
+            message: 'Quest is still active but incomplete.',
+            details: validationResult.details
+        };
+    }
+
+    validateTime(player) {
+        return player.timeSystem.totalMinutes <= this.target?.time;
     }
     update(player, gameState) {
 

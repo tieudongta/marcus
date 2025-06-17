@@ -21,6 +21,7 @@ export class Inventory {
     }
 
     hasItem(item) {
+        if (!item) return false; // Prevents error when item is undefined
         return this.items.some(entry => entry.item.name === item.name);
     }
     getItemByName(name) {

@@ -7,7 +7,8 @@ export async function handleMoralEncounter(player, encounter, { ask = null, choi
 
   if(encounter.id === "begging_child") {
     if (choice?.toLowerCase().startsWith('y')) {
-    const bread = player.inventory.findItem(i => i.name.includes('Bread'));
+    const bread = player.inventory.items.find(entry => entry.item.name === 'Bread');
+    //console.error(player.inventory.items);
     if (bread) {
       player.inventory.removeItem(bread);
       console.log(chalk.magenta("🧡 The child thanks you. You feel a bit lighter in spirit (Charisma++)."));

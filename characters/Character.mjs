@@ -69,6 +69,7 @@ export class Character {
         // Quests
         this.quests = [];
     }
+    
     addQuest(quest) {
         this.quests.push(quest);
         console.log(`Added quest: ${quest.name}`);
@@ -78,7 +79,7 @@ export class Character {
     }
     updateQuest(id, updateFunc) {
         const quest = this.getQuestById(id);
-        if(!quest) {
+        if (!quest) {
             console.warn(`Quest ${id} not found.`);
             return;
         }

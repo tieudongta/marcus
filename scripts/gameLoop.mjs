@@ -6,15 +6,21 @@ import { visitShop } from "./utils/playerMenu.mjs";
 import { generateNewQuest, completeQuest, viewActiveQuest } from "./utils/questSystem.mjs";
 import { QuestSystem } from "../core/QuestSystem.mjs";
 import { DeliveryQuest } from "../quests/DeliveryQuest.mjs";
+import { Quest } from "../quests/Quest.mjs";
 
 
 
 export async function startGameLoop(player, travelSystem, encounterSystem) {
-    const questManager = new QuestSystem();
+    const questManager = new QuestSystem(player);
     let active = true;
 
-    let currentQuest = questManager.createQuestFromTemplate('deliver');
-    questManager.addQuest(currentQuest);
+    let currentQuest = questManager.generateDeliveryQuest(player);
+    //console.error(currentQuest);
+    if (!currentQuest) {
+        console.error("⚠️ Failed to generate a delivery quest. Check player level, location, or template availability.");
+        return;
+    }
+
     while (active) {
         const { from, to } = currentQuest.data;
 
@@ -47,6 +53,17 @@ export async function startGameLoop(player, travelSystem, encounterSystem) {
         while (currentQuest.data.progress < selectedRoute.route.length - 1) {
             const current = currentQuest.data.route[currentQuest.data.progress];
             const next = currentQuest.data.route[currentQuest.data.progress + 1];
+            const validationResult = currentQuest.validate(player);
+            const questStatus = currentQuest.evaluateQuestStatus(validationResult);
+            if (questStatus.status === "failed") {
+                console.log(`\n❌ Quest failed: ${questStatus.message}`);
+                currentQuest.status = "failed";
+                break; // exit travel loop
+            } else if (questStatus.status === "completed") {
+                currentQuest.status = "completed";
+                console.log(`\n✅ Quest completed: ${questStatus.message}`);
+                break; // exit travel loop
+            }
             const connection = current.connections.find(c => c.name === next.name);
 
             if (!connection) {
@@ -146,7 +163,7 @@ export async function startGameLoop(player, travelSystem, encounterSystem) {
         ) {
             currentQuest.advanceStage();
             currentQuest.status = "completed";
-            
+
             console.log(`\n✅ Delivery completed at ${to}!`);
             console.log(`🕒 Final Time: ${player.timeSystem.FullTime}`);
             console.log(`⚡ Final Energy: ${player.energy}`);
@@ -163,7 +180,8 @@ export async function startGameLoop(player, travelSystem, encounterSystem) {
         const cont = await ask("🎮 Start a new delivery quest? (yes/no): ");
         if (cont.trim().toLowerCase().startsWith("y")) {
             currentQuest = questManager.createQuestFromTemplate('deliver');
-            questManager.addQuest(currentQuest);
+            //questManager.addQuest(currentQuest);
+            console.error(currentQuest);
         } else {
             active = false;
         }

@@ -23,7 +23,7 @@ export async function showPlayerMenu(player, currentLocation) {
   return choice;
 }
 export async function showQuestLog(questManager) {
-  const logText = questManager.getQuestStatusText();
+  const logText = questManager.getQuestStatusText(player);
   console.log("\n📘 Quest Log:");
   console.log(logText || "No active quests.");
   await ask("Press Enter to return.");
@@ -76,52 +76,113 @@ console.log("Shops at location:", shops);
     return await sellItems(player);
   }
 }
+//TODO: delete after test pass new function
+// async function buyItems(player, shopItems) {
+//   if (!shopItems.length) {
+//     console.log("\n🛒 The shop is empty.");
+//     return;
+//   }
+
+//   console.log(`\n💰 You have ${player.gold} gold.`);
+//   shopItems.forEach((item, i) => {
+//     console.log(`${i + 1}) ${item.name} - ${item.price} gold`);
+//   });
+
+//   const choice = parseInt(await ask("Select an item to buy (or 0 to exit): "), 10);
+//   if (choice > 0 && choice <= shopItems.length) {
+//     const selectedItem = shopItems[choice - 1];
+//     if (player.gold >= selectedItem.price) {
+//       const itemInstance = createItem(selectedItem.id || selectedItem.name.toLowerCase().replace(/ /g, "_"));
+//       player.inventory.addItem(itemInstance);
+//       player.gold -= selectedItem.price;
+//       console.log(`✅ You bought ${selectedItem.name}. 💰 Remaining: ${player.gold}`);
+//     } else {
+//       console.log("❌ Not enough gold.");
+//     }
+//   }
+// }
+// async function sellItems(player) {
+//   console.log("DEBUG: player.inventory.items =", player.inventory.items);
+
+//   const items = player.inventory.items;
+//   if (!items.length) {
+//     console.log("\n🎒 Your inventory is empty.");
+//     return;
+//   }
+
+//   console.log("\n📦 Items available to sell:");
+//   items.forEach(({ item }, index) => {
+//     const sellPrice = Math.floor((item.price || 0) / 2);
+//     console.log(`${index + 1}) ${item.name} - Sell for ${sellPrice} gold`);
+//   });
+
+//   const choice = parseInt(await ask("Select an item to sell (or 0 to exit): "), 10);
+//   if (choice > 0 && choice <= items.length) {
+//     const { item } = items[choice - 1];
+//     const sellPrice = Math.floor((item.price || 0) / 2);
+//     player.inventory.removeItem(item);
+//     player.gold += sellPrice;
+//     console.log(`✅ Sold ${item.name} for ${sellPrice} gold. 💰 Total: ${player.gold}`);
+//   }
+// }
 async function buyItems(player, shopItems) {
   if (!shopItems.length) {
     console.log("\n🛒 The shop is empty.");
     return;
   }
 
-  console.log(`\n💰 You have ${player.gold} gold.`);
-  shopItems.forEach((item, i) => {
-    console.log(`${i + 1}) ${item.name} - ${item.price} gold`);
-  });
+  while (true) {
+    console.log(`\n💰 You have ${player.gold} gold.`);
+    shopItems.forEach((item, i) => {
+      console.log(`${i + 1}) ${item.name} - ${item.price} gold`);
+    });
+    console.log("0) Exit buying");
 
-  const choice = parseInt(await ask("Select an item to buy (or 0 to exit): "), 10);
-  if (choice > 0 && choice <= shopItems.length) {
-    const selectedItem = shopItems[choice - 1];
-    if (player.gold >= selectedItem.price) {
-      const itemInstance = createItem(selectedItem.id || selectedItem.name.toLowerCase().replace(/ /g, "_"));
-      player.inventory.addItem(itemInstance);
-      player.gold -= selectedItem.price;
-      console.log(`✅ You bought ${selectedItem.name}. 💰 Remaining: ${player.gold}`);
+    const choice = parseInt(await ask("Select an item to buy (or 0 to exit): "), 10);
+    if (choice === 0) break;
+
+    if (choice > 0 && choice <= shopItems.length) {
+      const selectedItem = shopItems[choice - 1];
+      if (player.gold >= selectedItem.price) {
+        const itemInstance = createItem(selectedItem.id || selectedItem.name.toLowerCase().replace(/ /g, "_"));
+        player.inventory.addItem(itemInstance);
+        player.gold -= selectedItem.price;
+        console.log(`✅ You bought ${selectedItem.name}. 💰 Remaining: ${player.gold}`);
+      } else {
+        console.log("❌ Not enough gold.");
+      }
     } else {
-      console.log("❌ Not enough gold.");
+      console.log("❌ Invalid choice.");
     }
   }
 }
 async function sellItems(player) {
-  console.log("DEBUG: player.inventory.items =", player.inventory.items);
-
   const items = player.inventory.items;
   if (!items.length) {
     console.log("\n🎒 Your inventory is empty.");
     return;
   }
 
-  console.log("\n📦 Items available to sell:");
-  items.forEach(({ item }, index) => {
-    const sellPrice = Math.floor((item.price || 0) / 2);
-    console.log(`${index + 1}) ${item.name} - Sell for ${sellPrice} gold`);
-  });
+  while (true) {
+    console.log("\n📦 Items available to sell:");
+    items.forEach(({ item }, index) => {
+      const sellPrice = Math.floor((item.price || 0) / 2);
+      console.log(`${index + 1}) ${item.name} - Sell for ${sellPrice} gold`);
+    });
+    console.log("0) Exit selling");
 
-  const choice = parseInt(await ask("Select an item to sell (or 0 to exit): "), 10);
-  if (choice > 0 && choice <= items.length) {
-    const { item } = items[choice - 1];
-    const sellPrice = Math.floor((item.price || 0) / 2);
-    player.inventory.removeItem(item.name);
-    player.gold += sellPrice;
-    console.log(`✅ Sold ${item.name} for ${sellPrice} gold. 💰 Total: ${player.gold}`);
+    const choice = parseInt(await ask("Select an item to sell (or 0 to exit): "), 10);
+    if (choice === 0) break;
+
+    if (choice > 0 && choice <= items.length) {
+      const { item } = items[choice - 1];
+      const sellPrice = Math.floor((item.price || 0) / 2);
+      player.inventory.removeItem(item);
+      player.gold += sellPrice;
+      console.log(`✅ Sold ${item.name} for ${sellPrice} gold. 💰 Total: ${player.gold}`);
+    } else {
+      console.log("❌ Invalid choice.");
+    }
   }
 }
 
