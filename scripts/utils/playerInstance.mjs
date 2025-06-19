@@ -5,7 +5,7 @@ import { skillDataBank } from '../../data/skills/skillData.mjs';
 import { Location } from '../../world/Location.mjs';
 import { locations } from '../../data/world/locationPresets.mjs';
 
-const playerInstance = new Character({
+export const playerInstance = new Character({
   name: "Hero",
   race: "Orc",
   health: 100,
@@ -20,8 +20,8 @@ playerInstance.inventory.addItem(weapon);
 playerInstance.inventory.addItem(potion);
 playerInstance.inventory.addItem(food);
 playerInstance.gold = 100;
-playerInstance.currentLocation = new Location(locations['Feygrove']);
-playerInstance.activeQuest = null;
+playerInstance.currentLocation = new Location(locations["Neo"]);
+playerInstance.activeQuests = [];
 playerInstance.equipWeapon(weapon);
 //1console.log("After adding items, inventory:", playerInstance.inventory.items);
 export default playerInstance;

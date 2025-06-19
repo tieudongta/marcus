@@ -15,10 +15,23 @@ export const encounterPresets = [
     description: 'A hungry pack of wolves surrounds the party, eyes glowing in the dark.',
     race: 'Beast',
     region: ['forest', 'mountains'],
-    timeOfDay: ['Morning','Night'],
+    timeOfDay: ['Night'],
     difficulty: 'easy',
     handler: handleCombat,
     prompt: "You hear rustling in the bushes. You feel danger inside. Do you want to go ahead? Choose an action (yes/no): ",
+    choices: ["Yes", "No"]
+  },
+  {
+    id: 'rat',
+    name: 'Swamp of Giant Rat',
+    type: 'combat',
+    description: 'A crazy pack of rats attack people.',
+    race: 'Beast',
+    region: ['forest', 'mountains'],
+    timeOfDay: ['Morning'],
+    difficulty: 'easy',
+    handler: handleCombat,
+    prompt: "You see swamp of Giant Rats ahead. Do you want keep going? Choose an action (yes/no): ",
     choices: ["Yes", "No"]
   },
   {

@@ -150,6 +150,8 @@ export class TravelSystem {
         for (const conn of this.currentLocation.connections) {
             console.log(`- ${conn.name} (${conn.duration}h)`);
         }
+        return `📍 Current Location: ${this.currentLocation.name}\n
+                🌐 Connections: ${this.currentLocation.connections.map(conn => `- ${conn.name} (${conn.duration}h)`).join("\n")}`;
     }
 
     getAvailableDestination() {

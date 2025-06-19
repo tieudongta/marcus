@@ -1,5 +1,6 @@
 export class Item {
     constructor({ 
+        id,
         name, 
         description = "",
         type = "item",
@@ -8,6 +9,7 @@ export class Item {
         stackable = true, 
         price = 0, 
         rarity = "common", durability }) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.type = type;

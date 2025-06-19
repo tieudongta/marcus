@@ -10,8 +10,8 @@ import { Quest } from "../quests/Quest.mjs";
 
 
 
-export async function startGameLoop(player, travelSystem, encounterSystem) {
-    const questManager = new QuestSystem(player);
+export async function startGameLoop(player, travelSystem, encounterSystem, questManager) {
+    
     let active = true;
 
     let currentQuest = questManager.generateDeliveryGuide(player);

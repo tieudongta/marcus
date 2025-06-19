@@ -19,6 +19,7 @@ export class TimeSystem {
     advanceTime(hours = 0, minutes = 0) {
         const total = (hours * 60) + minutes;
         this.advance(total);
+        return this.formatTime(total);
     }
     advance(minutes) {
         this.totalMinutes += minutes;
@@ -96,5 +97,20 @@ export class TimeSystem {
         const minuteStr = minutes > 0 ? `${minutes} m ` : '';
 
         return `${dayStr}${hourStr}${minuteStr}left`.trim();
+    }
+    /**
+   * Convert total minutes to a friendly string, e.g. "2 h 30 m"
+   * @param {number} totalMinutes 
+   * @returns {string}
+   */
+    formatTime(totalMinutesLeft) {
+        if (totalMinutesLeft <= 0) return "0 m";
+
+        const hours = Math.floor((totalMinutesLeft % (24 * 60)) / 60);
+        const minutes = Math.floor(totalMinutesLeft % 60);
+
+        const hourStr = hours > 0 ? `${hours} h ` : '';
+        const minuteStr = minutes > 0 ? `${minutes} m ` : '';
+        return `${hourStr}${minuteStr}`.trim();
     }
 }

@@ -1,89 +1,123 @@
+import chalk from "chalk";
+import playerInstance from "./utils/playerInstance.mjs";
+import { FetchQuest } from "../quests/Quest.mjs";
+import { questPresets } from "../data/quests/questTemplates.mjs";
+import { QuestSystem } from "../core/QuestSystem.mjs";
+import { QuestFactory } from "../factory/quests/QuestFactory.mjs";
+import { Objective } from "../quests/objectives/Objective.mjs";
+import { locations } from "../data/world/locationPresets.mjs";
+import { Location } from "../world/Location.mjs";
+import { itemPresets } from "../data/items/itemPresets.mjs";
+import { Item } from "../items/Item.mjs";
+import { startGameLoop } from "./gameLoop.mjs";
+import playerInstance from "./utils/playerInstance.mjs";
+import { TravelSystem } from "../core/TravelSystem.mjs";
+import { EncounterSystem } from "../core/EncounterSystem.mjs";
+import { encounterPresets } from "../data/encounters/encounterPresets.mjs";
+import { QuestSystem } from "../core/QuestSystem.mjs";
 import { ask } from "./utils/ask.mjs";
-import { setupPlayer, setupSystems } from "./utils/setupGame.mjs";
-import { generateLocation } from "./utils/generateLocation.mjs";
 
-// === INIT GAME ===
-const player = setupPlayer();
-const { travelSystem, encounterManager } = setupSystems(player);
+// DOM Elements
+const logEl = document.getElementById("log");
+const inputEl = document.getElementById("player-input");
+const submitBtn = document.getElementById("submit-button");
 
-console.log("\n📦 Delivery Quest: You have a cargo order!");
+let inputResolver = null;
 
-// === PICK DELIVERY ORDER ===
-const [from, to] = generateLocation();
-console.log(`\n📍 Planning route from ${from} to ${to}...`);
-
-const allRoutes = travelSystem.findAllPaths(from, to);
-if (!allRoutes.length) {
-  console.error("❌ No available routes found.");
-  process.exit(1);
+// Override `ask` to use UI
+function logText(text) {
+  logEl.innerHTML += text + "\n";
+  logEl.scrollTop = logEl.scrollHeight;
 }
 
-const options = travelSystem.selectRoute(allRoutes);
-console.log(`\nFound ${options.length} route(s). Choose one:`);
-options.forEach((opt, idx) => {
-  console.log(`${idx + 1}) Time: ${opt.totalTime}h, Energy: ${opt.totalEnergy}`);
-  console.log(`   Route: ${opt.route.map(loc => loc.name).join(" -> ")}`);
+function overrideAsk(promptText) {
+  logText(`📝 ${promptText}`);
+  return new Promise((resolve) => {
+    inputResolver = resolve;
+  });
+}
+
+// Attach input handler
+submitBtn.addEventListener("click", () => {
+  if (inputResolver) {
+    const value = inputEl.value;
+    inputEl.value = "";
+    logText(`👉 ${value}`);
+    inputResolver(value);
+    inputResolver = null;
+  }
 });
 
-const routeIndex = parseInt(await ask("Select a route (1 or 2): "), 10) - 1;
-const selected = options[routeIndex];
-if (!selected) {
-  console.error("❌ Invalid route selection.");
-  process.exit(1);
-}
+// Re-bind `ask` globally
+const globalAsk = overrideAsk;
+Object.defineProperty(window, "ask", {
+  value: globalAsk,
+  writable: false,
+});
 
-console.log(`\n🧭 Starting journey from ${from} to ${to}...\n`);
+// Patch `ask` module
+import * as askModule from "./utils/ask.mjs";
+askModule.ask = globalAsk;
 
-let currentIdx = 0;
-while (currentIdx < selected.route.length - 1) {
-  const current = selected.route[currentIdx];
-  const next = selected.route[currentIdx + 1];
-  const connection = current.connections.find(c => c.name === next.name);
+// Start game
+(async () => {
+  const player = playerInstance;
+  const travelSystem = new TravelSystem(player);
+  travelSystem.currentLocation = player.currentLocation;
+  const questManager = new QuestSystem(player);
+  const encounterSystem = new EncounterSystem(encounterPresets, { ask: globalAsk, questManager });
 
-  if (!connection) {
-    console.error(`❌ No connection from ${current.name} to ${next.name}`);
-    break;
+  logText("🎮 Welcome to the Delivery Quest RPG!");
+  await startGameLoop(player, travelSystem, encounterSystem, questManager);
+})();
+
+function displayQuest(quest) {
+  console.log(chalk.bold.cyan(`\n🎯 QUEST: ${quest.name}`));
+  console.log(chalk.gray(quest.description));
+
+  console.log(chalk.yellowBright(`\n📍 Stage ${quest.currentStage + 1}/${quest.stages.length}: ${quest.stages[quest.currentStage].name}`));
+  console.log(chalk.dim(`   ${quest.stages[quest.currentStage].description}`));
+
+  console.log("\n📌 Objectives:");
+  const currentStage = quest.stages[quest.currentStage];
+  currentStage.objectives.forEach((obj, idx) => {
+    const status = obj.isCompleted() ? chalk.green("✔ Completed") : chalk.gray("✘ Incomplete");
+    const desc = obj.isCompleted() ? chalk.strikethrough(obj.description) : obj.description;
+    console.log(` ${chalk.bold(`#${idx + 1}`)} - ${desc} ${status}`);
+  });
+
+  const progressPercent = Math.floor(((quest.currentStage + 1) / quest.stages.length) * 100);
+  const progressBar = chalk.magentaBright("█".repeat(progressPercent / 10)).padEnd(10, chalk.dim("░"));
+
+  console.log(`\n📊 Progress: [${progressBar}] ${progressPercent}%`);
+
+  if (quest.completed) {
+    console.log(chalk.bgGreen.black.bold("\n✅ QUEST COMPLETE"));
   }
-
-  const travelTime = connection.duration;
-  const energyCost = travelTime * 5;
-
-  const action = await ask(
-    `Next: ${current.name} -> ${next.name} (${travelTime}h, -${energyCost} energy). Move now? (yes/no): `
-  );
-
-  if (action.toLowerCase().startsWith("y")) {
-    const encounterBefore = await encounterManager.triggerEncounter(player, current);
-    if (encounterBefore?.interrupt) {
-      console.log(` Encounter prevented travel at ${current.name}`);
-      continue;
-    }
-
-    player.timeSystem.advanceTime(travelTime);
-    player.loseEnergy(energyCost);
-    player.currentLocation = next;
-    travelSystem.currentLocation = next;
-    currentIdx++;
-
-    console.log(`🚶 Arrived at ${next.name}. Now: ${player.timeSystem.FullTime}, Energy left: ${player.energy}`);
-
-    const encounterAfter = await encounterManager.triggerEncounter(player, next);
-    if (encounterAfter?.interrupt) {
-      console.log(`⚠️ Post-arrival encounter at ${next.name} interrupted the flow.`);
-    }
-
+}
+function arriveAtLocation(quest, locationName) {
+  const locObj = quest.objectives.find(obj => obj instanceof LocationObjective);
+  if (locObj && locObj.validate(locationName)) {
+    locObj.completed = true;
+    console.log(chalk.green(`📍 Location objective complete: ${locObj.description}`));
   } else {
-    let proceed = false;
-    while (!proceed) {
-      const wait = await ask("⏳ Waiting... Ready to move on? (yes): ");
-      if (wait.toLowerCase().startsWith("y")) {
-        proceed = true;
-      }
-    }
+    console.log(chalk.red(`❌ You are not at the correct location.`));
   }
 }
 
-console.log('Delivery complete at '+to);
-console.log(`📅 Current Time: ${player.timeSystem.FullTime}`);
-console.log(`⚡ Remaining Energy: ${player.energy}`);
-process.exit(0);
+const player = playerInstance;
+const questManager = new QuestSystem(player);
+if(questManager.availableQuests.length > 0) {
+  console.log(chalk.magenta(questManager.availableQuests.map(q => q.name).join(", ")));
+}
+const quest = questManager.availableQuests[0];
+player.acceptQuest(questManager, quest);
+
+console.error(player.inventory);
+quest.update(player);
+displayQuest(quest);
+quest.update(player);
+displayQuest(quest);
+player.currentLocation = new Location(locations["Gor'mok"]);
+quest.update(player);
+displayQuest(quest);

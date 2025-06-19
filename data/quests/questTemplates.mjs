@@ -4,10 +4,6 @@ export const questPresets = [
     type: "deliver",
     name: "Urgent Delivery to the Capital",
     description: "Deliver this sealed scroll to officials in the capital.",
-    target: {
-      item: "sealed_scroll",
-      timeOffset: 48, // hours from quest start
-    },
     reward: {
       gold: 150,
       xp: 100,
@@ -19,12 +15,30 @@ export const questPresets = [
       ],
     },
     stages: [
-      { name: "Receive Quest", description: "Receive the sealed scroll." },
-      { name: "Travel to Destination", description: "Travel to the capital with the scroll." },
-      { name: "Deliver Package", description: "Deliver the scroll to the capital officials." },
-      { name: "Complete Quest", description: "Confirm successful delivery." },
-    ],
-  },
+      {
+        name: "Receive Quest",
+        description: "Receive the sealed scroll.",
+        objectives: [
+          { type: "item", item: "sealed_scroll" }
+        ]
+      },
+      {
+        name: "Execute Quest",
+        description: "Travel to the capital.",
+        objectives: [
+          { type: "location", location: "Gor'mok" }
+        ]
+      },
+      {
+        name: "Deliver Quest",
+        description: "Deliver the scroll to officials.",
+        objectives: [
+          { type: "time", deadlineHours: 48 }
+        ]
+      }
+    ]
+  }
+  ,
   {
     id: "deliver_letter_1",
     type: "deliver",
@@ -75,4 +89,32 @@ export const questPresets = [
       { name: "Complete Quest", description: "Conclude the delivery process." },
     ],
   },
+  {
+    id: "kill_rat",
+    type: "deliver",
+    name: "Kill the rats",
+    description: "Recently the rat population has grown out suspiciously. They begin to attack people. Your mission: kill 10 rats.",
+    npcLevel: 3,
+    reward: {
+      baseGold: 100,
+      baseXp: 100,
+    },
+    target: {
+      enemy: "rat",
+      number: 10,
+      timeOffset: 240,
+    },
+    stages: [
+      { name: "Receive Quest", description: "Get the order from the NPC." },
+      { name: "Begin the killing", description: "Start killing rats." },
+      { name: "Finish the killing", description: "Killed rats reach 10." },
+      { name: "Complete Quest", description: "Bring 10 rats body to the NPC." },
+    ],
+    trigger: {
+      conditions: [
+        { type: "player_level", operator: ">", value: 2 },
+        { type: "has_killed", value: "rat" },
+      ],
+    },
+  }
 ];

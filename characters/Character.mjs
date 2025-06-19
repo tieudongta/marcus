@@ -7,6 +7,10 @@ import { LEVELING_CONFIG, raceStatIncrements } from '../data/configs/levelingCon
 import { Location } from '../world/Location.mjs';
 import { locations } from '../data/world/locationPresets.mjs';
 import { TimeSystem } from '../core/TimeSystem.mjs';
+import { Item } from '../items/Item.mjs';
+import { itemPresets } from '../data/items/itemPresets.mjs';
+import { actionConfigs } from '../data/configs/actionConfigs.mjs';
+import { TravelSystem } from '../core/TravelSystem.mjs';
 export class Character {
     _energy;
     _health;
@@ -28,6 +32,7 @@ export class Character {
         timeSystem = null,
         allSkills = null,
         inventory = null,
+        travelSystem = null,
         currentLocation = null
     } = {}) {
         this.name = name;
@@ -52,6 +57,7 @@ export class Character {
         // Inventory
         this.inventory = inventory || new Inventory();//
         this.timeSystem = timeSystem || new TimeSystem();
+        this.travelSystem = travelSystem || new TravelSystem();
         this.isResting = false;
         this.isPlayer = isPlayer;
 
@@ -67,11 +73,80 @@ export class Character {
             this.currentLocation = new Location(startingLocationData);
         }
         // Quests
-        this.quests = [];
+        this.activeQuests = [];
+        this.completedQuests = [];
+        this.kills = [];
     }
-    
-    addQuest(quest) {
-        this.quests.push(quest);
+    getAvailableActions() {
+  const actions = Object.values(actionConfigs);
+  const currentPhase = this.timeSystem.phase.toLowerCase();
+
+  return actions
+    // Time-of-day check
+    .filter(action => 
+      action.dayPhase.includes("any") ||
+      action.dayPhase.includes(currentPhase)
+    )
+    // Energy filtering logic
+    .filter(action => {
+      if (this.energy > this.maxEnergy * 0.7) {
+        return action.name !== "eat" && action.name !== "rest" && action.name !== "sleep";
+      }
+      if (this.energy < this.maxEnergy * 0.3) {
+        return action.name !== "hunt" && action.name !== "forage";
+      }
+       return true;
+    })
+    // Location filtering logic
+    .filter(action => {
+        return action.locationType.includes(this.currentLocation.type) || action.locationType.includes("any");
+    })
+    // Inventory-based requirement
+    .filter(action => {
+      if (action.itemType !== null) {
+        return this.inventory.hasItemType(action.itemType);
+      }
+      return true;
+    })
+    // Return only the minimal action data needed for UI
+    .map(({ name, description }) => ({ name, description }));
+}
+    eat() {
+        console.log("Need to remove item from inventory");
+    }
+    performAction(str) {
+        let msg;
+        const time = this.timeSystem.advanceTime(actionConfigs[str].timeCost);
+        msg = `You ${str} in ${time}, `
+        if(str === "eat") {
+            this.eat();
+        }
+        if(actionConfigs[str].energyCost > 0) {
+            const energy = this.loseEnergy(actionConfigs[str].energyCost);
+            msg += ` lose ${energy} energy,`;
+        } else {
+            const energy = this.recoverEnergy(Math.abs(actionConfigs[str].energyCost));
+            msg += ` recover ${energy} energy,`;
+        }
+        if ( actionConfigs[str].xp > 0) {
+            
+            const xp = this.gainXp(actionConfigs[str].xp);
+            msg += ` gain ${xp} XP`
+        }
+        
+        return msg;
+    }
+
+    addCompletedQuest(quest) {
+        if(quest.completed) {
+            this.activeQuests = this.activeQuests.filter(q => q !== quest);
+            this.completedQuests.push(quest);
+        }
+    }
+    acceptQuest(questSystem, quest) {   
+        questSystem.addQuestToPlayer(quest, this);
+        quest.start(this);
+        quest.update(this);
         console.log(`Added quest: ${quest.name}`);
     }
     getQuestById(id) {
@@ -168,7 +243,9 @@ export class Character {
             nextlLevelXp = this.xpToNextLevel(this.level);
         }
         // 🔧 Add this:
+        
         console.log(`${this.name}'s XP is now: ${this.xp}`);
+        return amount;
     }
     xpToNextLevel(level) {
         const { type, exponent, multiplier } = LEVELING_CONFIG.xpCurve;
@@ -272,10 +349,12 @@ export class Character {
     recoverEnergy(amount) {
         this.energy += amount;
         console.log(`${this.name} recovers ${amount} energy. Energy is now ${this.energy}/${this.maxEnergy}.`);
+        return amount;
     }
     loseEnergy(amount) {
         this.energy -= amount;
         console.log(`${this.name} lost ${amount} energy. Energy is now ${this.energy}/${this.maxEnergy}.`);
+        return amount;
     }
     die() {
         this.health = 0;

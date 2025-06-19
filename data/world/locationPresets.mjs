@@ -60,6 +60,29 @@ export const locations = {
     ],
     shops: []
   },
+  Neo: {
+    name: "Neo",
+    description: "A village somewhere in the forest.",
+    race: "Elf",
+    type: "village",
+    region: "forest",
+    connections: [
+      { name: "Silverbrook", duration: 2 },
+      { name: "Black Forest", duration: 1 },
+    ],
+    shops: [shopPresets.foodMarket]
+  },
+  black_forest: {
+    name: "Black forest",
+    description: "An elven forest.",
+    race: "Elf",
+    type: "forest",
+    region: "forest",
+    connections: [
+      { name: "Neo", duration: 1 },
+    ],
+    shops: []
+  },
   Feygrove: {
     name: "Feygrove",
     description: "A mystical thicket where the veil between worlds is thin and nature spirits whisper.",

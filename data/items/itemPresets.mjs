@@ -6,6 +6,7 @@ import { Tool } from "../../items/Tool.mjs";
 export const itemPresets = {
     //Weapon
     wooden_sword: new Weapon({
+      id: "wooden_sword",
     name: "Wooden Sword",
     description: "A sturdy basic sword.",
     attackPower: 12,
@@ -14,6 +15,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   bronze_sword: new Weapon({
+    id: "bronze_sword",
     name: "Bronze Sword",
     attackPower: 10,
     durability: 80,
@@ -22,6 +24,7 @@ export const itemPresets = {
     rarity: "common",
   }),
   iron_sword: new Weapon({
+    id: "iron_sword",
     name: "Iron Sword",
     attackPower: 20,
     durability: 100,
@@ -30,6 +33,7 @@ export const itemPresets = {
     rarity: "common",
   }),
   elf_dagger : new Weapon({
+    id: "efl_dagger",
     name: "Elven Dagger",
     description: "Swift and deadly.",
     attackPower: 8,
@@ -40,6 +44,7 @@ export const itemPresets = {
   
 //Potion
   healing_herbs: new Potion({
+    id: "healing_herbs",
     name: "Healing Herbs",
     description: "Heals 10 HP",
     effectAmount: 10,
@@ -47,6 +52,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   minor_health_potion: new Potion({
+    id: "minor_health_potion",
     name: "Minor Healing Potion",
     description: "Heals 20 HP",
     effectAmount: 20,
@@ -54,6 +60,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   health_potion: new Potion({
+    id: "health_potion",
     name: "Health Potion",
     description: "Restores 50 HP",
     effectAmount: 50,
@@ -62,6 +69,7 @@ export const itemPresets = {
     rarity: "common",
   }),
   energy_elixir: new Potion({
+    id: "energy_elixir",
     name: "Energy Elixir",
     description: "Restores 15 energy",
     effectAmount: 15,
@@ -70,6 +78,7 @@ export const itemPresets = {
   }),
 // Material
   cheese: new Item({
+    id: "chees",
     name: "Cheese Piece",
     description: "Might attract rodents.",
     type: "item",
@@ -79,6 +88,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   sealed_scroll: new Item({
+    id: "sealed_scroll",
     name: "Sealed Scroll",
     description: "The scroll is sealed. You don't know what inside.",
     type: "item",
@@ -89,6 +99,7 @@ export const itemPresets = {
   }),
 
   fur: new Item({
+    id: "fur",
     name: "Rat Fur",
     description: "Soft but smelly.",
     type: "material",
@@ -98,6 +109,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   magic_scroll: new Item({
+    id: "magic_scroll",
     name: "Magic Scroll",
     description: "Unknown magic scroll.",
     type: "magic",
@@ -107,6 +119,7 @@ export const itemPresets = {
     rarity: "rare"
   }),
   package: new Item({
+    id: "package",
     name: "Package",
     description: "A package to deliver.",
     type: "item",
@@ -116,6 +129,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   bread: new Item({
+    id: "bread",
     name: "Bread",
     description: "Not good food.",
     type: "item",
@@ -124,7 +138,18 @@ export const itemPresets = {
     price: 1,
     rarity: "common"
   }),
+  herb: new Item({
+    id: "herb",
+    name: "Herb",
+    description: "Edible Herbs",
+    type: "item",
+    durability: 10,
+    stackable: true,
+    price: 1,
+    rarity: "common"
+  }),
   iron_shard: new Material({
+    id: "iron_shard",
     name: "Iron Shard",
     description: "Used to enhance basic weapons.",
     effect: "enhance",
@@ -133,6 +158,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   crystal_powder: new Material({
+    id: "crystal_powder",
     name: "Crystal Powder",
     description: "Used to repair magical tools.",
     effect: "repair",
@@ -142,6 +168,7 @@ export const itemPresets = {
   }),
   // Tool
   mining_pick: new Tool({
+    id: "mining_pick",
     name: "Mining Pick",
     description: "Can be used to gather minerals.",
     effect: "gather",
@@ -151,6 +178,7 @@ export const itemPresets = {
     rarity: "common"
   }),
   spell_pen: new Tool({
+    id: "spell_pen",
     name: "Enchanter's Spell Pen",
     description: "Pen used writing Spell.",
     effect: "enhance",
@@ -160,6 +188,7 @@ export const itemPresets = {
     rarity: "uncommon"
   }),
   legendary_amulet: new Item({
+    id: "legendary_amulet",
     name: "Legendary Amulet",
     description: "Unknown Amulet.",
     type: "item",

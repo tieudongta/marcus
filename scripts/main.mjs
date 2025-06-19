@@ -7,6 +7,8 @@ import { encounterPresets } from "../data/encounters/encounterPresets.mjs";
 import { ask } from "./utils/ask.mjs";
 import { startGameLoop } from "./gameLoop.mjs";
 import playerInstance from "./utils/playerInstance.mjs";
+import { QuestSystem } from "../core/QuestSystem.mjs";
+import { KillQuest } from "../quests/KillQuest.mjs";
 // const player = new Character({
 //   name: "Hero",
 //   race: "Elf",
@@ -15,11 +17,13 @@ import playerInstance from "./utils/playerInstance.mjs";
 //   timeSystem: new TimeSystem(),
 // });
 // player.agility = 10;
+
 const player = playerInstance;
+player.activeQuests = player.activeQuests || [];
 const travelSystem = new TravelSystem(player);
 travelSystem.currentLocation = player.currentLocation;
-
-const encounterSystem = new EncounterSystem(encounterPresets, { ask });
-
+const questManager = new QuestSystem(player);
+const encounterSystem = new EncounterSystem(encounterPresets, { ask, questManager });
+//console.error(player,encounterSystem, questManager);
 console.log("🎮 Welcome to the Delivery Quest RPG!");
-await startGameLoop(player, travelSystem, encounterSystem);
+await startGameLoop(player, travelSystem, encounterSystem, questManager);

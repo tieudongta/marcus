@@ -19,10 +19,15 @@ export class Inventory {
         console.log("Inventory merged successfully.");
         return true;
     }
-
+    hasItemById(itemId) {
+        return this.items.some(entry => entry.item.id === itemId);
+    }
     hasItem(item) {
         if (!item) return false; // Prevents error when item is undefined
         return this.items.some(entry => entry.item.name === item.name);
+    }
+    hasItemType(type) {
+        return this.items.some(entry => entry.item.type === type);
     }
     getItemByName(name) {
         const entry = this.items.find(entry => entry.item.name === name);

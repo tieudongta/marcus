@@ -1,85 +1,88 @@
 import chalk from "chalk";
+import { ItemObjective, LocationObjective, TimeObjective } from "./objectives/Objective.mjs";
+import { Location } from "../world/Location.mjs";
+import { formatTimeLeft } from "../utils/formatDateTime.mjs";
+import { Item } from "../items/Item.mjs";
+import { itemPresets } from "../data/items/itemPresets.mjs";
 
 export class Quest {
-  constructor({ id, name, description, stages = [], target = {} }) {
+  constructor({ id, type, name, description, reward, stages = [], trigger }) {
     this.id = id;
     this.name = name;
+    this.type = type;
     this.description = description;
+    this.reward = reward;
+    this.completed = false;
     this.stages = stages;
     this.currentStage = 0;
-    this.status = 'not_started'; // 'not_started' | 'in_progress' | 'completed' | 'failed'
-    this.data = {};
-    this.target = target;
+    this.trigger = trigger || null;
   }
+  start(player) {
+    console.log(chalk.magenta("📜 Starting quest..."));
 
-  start() {
-    if (this.status !== 'not_started') {
-      console.warn(`⚠ Quest "${this.name}" already started or finished.`);
-      return;
-    }
-
-    this.status = 'in_progress';
-    this.currentStage = 0;
-    console.log(chalk.magenta(`🚀 Quest '${this.name}' started. Stage: "${this.getStage()?.name}"`));
-  }
-
-  getStage() {
-    return this.stages[this.currentStage] ?? null;
-  }
-
-  advanceStage() {
-    if (this.currentStage < this.stages.length - 1) {
-      this.currentStage++;
-      console.log(chalk.magenta(`➡ Quest '${this.name}' advanced to stage: "${this.getStage()?.name}"`));
-    } else {
-      this.status = 'completed';
-      console.log(chalk.magenta(`🏁 Quest '${this.name}' completed!`));
+    // Only auto-provide items for deliver quests
+    if (this.type === "deliver") {
+      const stage = this.stages[this.currentStage];
+      for (const obj of stage.objectives) {
+        console.log(player);
+        if (obj instanceof ItemObjective) {
+          const itemAlreadyHeld = player.inventory.hasItemById(obj.item);
+          if (!itemAlreadyHeld) {
+            const item = new Item(itemPresets[obj.item]);
+            player.addItemToInventory(item);
+            console.log(chalk.yellow("Object added: "), item);
+            console.log(chalk.yellow(`📦 Player received quest item: ${item.name}`));
+          }
+        }
+      }
     }
   }
 
-  fail(reason = 'Unknown reason') {
-    this.status = 'failed';
-    console.log(chalk.blueBright(`❌ Quest '${this.name}' failed: ${reason}`));
-  }
+  update(player) {
+    const stage = this.stages[this.currentStage];
 
-  evaluateQuestStatus(validationResult) {
-    if (!validationResult?.isValid) {
-      return {
-        status: 'expired',
-        message: 'Quest has expired or is no longer valid.',
-      };
+    for (const obj of stage.objectives) {
+      if (obj instanceof LocationObjective && obj.validate(player.currentLocation)) {
+        obj.completed = true;
+      }
+      if (obj instanceof ItemObjective && player.inventory.hasItemById(obj.item)) {
+        obj.completed = true;
+      }
+      if (obj instanceof TimeObjective && obj.validate(Date.now())) {
+        obj.completed = true;
+      }
     }
 
-    if (validationResult.isComplete) {
-      return {
-        status: 'complete',
-        message: 'Quest objectives completed successfully!',
-      };
+    const allComplete = stage.objectives.every(o => o.completed);
+    if (allComplete) {
+      if (this.currentStage < this.stages.length - 1) {
+        this.currentStage++;
+        console.log(chalk.blue(`➡️ Stage advanced to: ${this.stages[this.currentStage].name}`));
+      } else {
+        this.complete(player);
+        console.log(chalk.greenBright("🏁 Quest completed!"));
+      }
     }
-
-    return {
-      status: 'in_progress',
-      message: 'Quest is still active but incomplete.',
-      details: validationResult.details,
-    };
   }
 
-  validateTime(player) {
-    const targetTimeLimit = this.target?.time ?? this.target?.timeOffset * 60;
-    return player.timeSystem.totalMinutes <= targetTimeLimit;
+  get currentObjectives() {
+    return this.stages[this.currentStage]?.objectives || [];
   }
 
-  get progress() {
-    return this.data?.progress ?? 0;
+  complete(player) {
+    this.completed = true;
+    this.reward?.grant(player);
+    player.addCompletedQuest(this);
   }
-
-  update(player, gameState) {
-    // Default behavior: attempt to auto-advance if a custom `validateStage` is defined
-    const stage = this.getStage();
-    if (this.status !== 'in_progress' || !stage) return;
-
-    if (typeof this.validateStage === 'function' && this.validateStage(player, gameState, stage)) {
+  checkCompleted() {
+    const allComplete = this.currentObjectives.every(obj => obj.isCompleted());
+    if (allComplete) {
       this.advanceStage();
     }
+  }
+}
+export class FetchQuest extends Quest {
+  constructor({ id, name, type, description, reward, stages, trigger }) {
+    super({ id, name,type, description, reward, stages, trigger });
   }
 }

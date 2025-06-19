@@ -69,6 +69,7 @@ export class EncounterSystem {
     const result = await handler(player, encounter, {
       ask: this.utils.ask,
       choice,
+      questManager: this.utils.questManager
     });
 
     return result ?? { interrupt: false };
