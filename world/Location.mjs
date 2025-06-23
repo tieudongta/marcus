@@ -8,6 +8,7 @@ export class Location {
         race = "human",
         connections = [],
         region = "forest",
+        src = "/data/assets/bleeding-clearing.png",
         shops = [],
     }) {
         this.name = name;
@@ -17,6 +18,7 @@ export class Location {
         this.connections = connections;
         this.region = region;
         this.shops = shops;
+        this.src = src;
     }
     moveTo(destination) {
         if (!(destination instanceof Location)) return 0;

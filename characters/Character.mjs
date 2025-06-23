@@ -78,39 +78,38 @@ export class Character {
         this.kills = [];
     }
     getAvailableActions() {
-  const actions = Object.values(actionConfigs);
-  const currentPhase = this.timeSystem.phase.toLowerCase();
-
-  return actions
-    // Time-of-day check
-    .filter(action => 
-      action.dayPhase.includes("any") ||
-      action.dayPhase.includes(currentPhase)
-    )
-    // Energy filtering logic
-    .filter(action => {
-      if (this.energy > this.maxEnergy * 0.7) {
-        return action.name !== "eat" && action.name !== "rest" && action.name !== "sleep";
-      }
-      if (this.energy < this.maxEnergy * 0.3) {
-        return action.name !== "hunt" && action.name !== "forage";
-      }
-       return true;
-    })
-    // Location filtering logic
-    .filter(action => {
-        return action.locationType.includes(this.currentLocation.type) || action.locationType.includes("any");
-    })
-    // Inventory-based requirement
-    .filter(action => {
-      if (action.itemType !== null) {
-        return this.inventory.hasItemType(action.itemType);
-      }
-      return true;
-    })
-    // Return only the minimal action data needed for UI
-    .map(({ name, description }) => ({ name, description }));
-}
+        const actions = Object.values(actionConfigs);
+        const currentPhase = this.timeSystem.phase.toLowerCase();
+        return actions
+            // Time-of-day check
+            .filter(action =>
+                action.dayPhase.includes("any") ||
+                action.dayPhase.includes(currentPhase)
+            )
+            // Energy filtering logic
+            .filter(action => {
+                if (this.energy > this.maxEnergy * 0.7) {
+                    return action.name !== "eat" && action.name !== "rest" && action.name !== "sleep";
+                }
+                if (this.energy < this.maxEnergy * 0.3) {
+                    return action.name !== "hunt" && action.name !== "forage";
+                }
+                return true;
+            })
+            // Location filtering logic
+            .filter(action => {
+                return action.locationType.includes(this.currentLocation.type) || action.locationType.includes("any");
+            })
+            // Inventory-based requirement
+            .filter(action => {
+                if (action.itemType !== null) {
+                    return this.inventory.hasItemType(action.itemType);
+                }
+                return true;
+            })
+            // Return only the minimal action data needed for UI
+            .map(({ name, description }) => ({ name, description }));
+    }
     eat() {
         console.log("Need to remove item from inventory");
     }
@@ -118,32 +117,32 @@ export class Character {
         let msg;
         const time = this.timeSystem.advanceTime(actionConfigs[str].timeCost);
         msg = `You ${str} in ${time}, `
-        if(str === "eat") {
+        if (str === "eat") {
             this.eat();
         }
-        if(actionConfigs[str].energyCost > 0) {
+        if (actionConfigs[str].energyCost > 0) {
             const energy = this.loseEnergy(actionConfigs[str].energyCost);
             msg += ` lose ${energy} energy,`;
         } else {
             const energy = this.recoverEnergy(Math.abs(actionConfigs[str].energyCost));
             msg += ` recover ${energy} energy,`;
         }
-        if ( actionConfigs[str].xp > 0) {
-            
+        if (actionConfigs[str].xp > 0) {
+
             const xp = this.gainXp(actionConfigs[str].xp);
             msg += ` gain ${xp} XP`
         }
-        
+
         return msg;
     }
 
     addCompletedQuest(quest) {
-        if(quest.completed) {
+        if (quest.completed) {
             this.activeQuests = this.activeQuests.filter(q => q !== quest);
             this.completedQuests.push(quest);
         }
     }
-    acceptQuest(questSystem, quest) {   
+    acceptQuest(questSystem, quest) {
         questSystem.addQuestToPlayer(quest, this);
         quest.start(this);
         quest.update(this);
@@ -170,7 +169,7 @@ export class Character {
         this._energy = Math.min(val, this.maxEnergy);
     }
     get energy() {
-        return this._energy;
+        return Math.floor(this._energy);
     }
     set health(val) {
         this._health = Math.min(val, this.maxHealth);
@@ -243,7 +242,7 @@ export class Character {
             nextlLevelXp = this.xpToNextLevel(this.level);
         }
         // 🔧 Add this:
-        
+
         console.log(`${this.name}'s XP is now: ${this.xp}`);
         return amount;
     }

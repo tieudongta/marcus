@@ -11,10 +11,10 @@ export const actionConfigs = {
     },
     talk: {
         name: "talk",
-        description: "Talk to a village",
+        description: "Talk to a villager",
         locationType: ["any"],
         dayPhase: ["morning", "afternoon", "evening"],
-        itemType: null,
+        itemType: "npc",
         xp: 5,
         energyCost: 10,
         timeCost: 1,
@@ -62,9 +62,10 @@ export const actionConfigs = {
     explore: {
         name: "explore",
         descript: "Exploring the current location",
+        locationType: ["any"],
         itemType: null,
         dayPhase: ["any"],
-        xp: 0,
+        xp: 5,
         energyCost: 5,
         timeCost: 0.1,
     }

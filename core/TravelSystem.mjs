@@ -5,8 +5,6 @@ import { Location } from "../world/Location.mjs";
 export class TravelSystem {
     constructor(player) {
         this.player = player;
-        this.timeSystem = player.timeSystem;
-        this.currentLocation = player.currentLocation || null;
     }
 
     // Basic BFS pathfinder
@@ -171,7 +169,7 @@ export class TravelSystem {
             return false;
         }
 
-        this.timeSystem.advanceTime(travelTime);  // ✅ Advance hours
+        this.player.timeSystem.advanceTime(travelTime);  // ✅ Advance hours
         
         this.player.loseEnergy(time * 5);
         this.player.locationName = destination.name;

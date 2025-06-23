@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG Game</title>
+  <link rel="stylesheet" href="/styles/styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- 🔝 Top Bar -->
+    <div id="top-bar">
+      <span id="game-time">Day 1 - Morning</span>
+      <span id="player-status">HP: 100 / 100</span>
+      <button id="show-details">Details</button>
+    </div>
+
+    <!-- 🖼 Info Panel with Background Image -->
+    <div id="info-panel">
+      <p id="game-message">Welcome to the world!</p>
+
+      <!-- Overlayed Dialog + Actions -->
+      <div id="overfloat">
+        <div id="dialog-box">
+          <p id="dialog-text">Your journey begins here...</p>
+        </div>
+        <div id="action-buttons">
+          <!-- Buttons will be rendered dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 🧾 Player Modal -->
+    <div id="player-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Player Details</h2>
+        <div id="player-detail-content"></div>
+        <button id="open-inventory">Inventory</button>
+        <button id="close-details">Close</button>
+      </div>
+    </div>
+
+    <!-- 🧳 Inventory Modal -->
+    <div id="inventory-modal" class="modal hidden">
+      <div class="modal-content">
+        <h2>Inventory</h2>
+        <div id="inventory-content"></div>
+        <button id="close-inventory">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/games/Main.mjs" type="module"></script>
+</body>
+</html>

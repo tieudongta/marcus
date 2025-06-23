@@ -70,7 +70,8 @@ export const locations = {
       { name: "Silverbrook", duration: 2 },
       { name: "Black Forest", duration: 1 },
     ],
-    shops: [shopPresets.foodMarket]
+    shops: [shopPresets.foodMarket],
+    src: "data/assets/scenes/bleeding-clearing.png"
   },
   black_forest: {
     name: "Black forest",
